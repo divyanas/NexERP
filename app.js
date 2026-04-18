@@ -83,10 +83,6 @@ window.login = () => {
 };
 
 
-  document.getElementById('login-error').style.display = 'block';
-};
-
-
 function renderStudentDashboard(student) {
   appDiv.innerHTML = `
     <div class="dashboard">
@@ -116,7 +112,6 @@ function renderFacultyDashboard(faculty) {
     </div>
   `;
 }
-
 
 
 
