@@ -151,6 +151,7 @@ function renderFacultyDashboard(faculty) {
 }
 
 
+
 window.renderQRCreation = (classId) => {
   appDiv.innerHTML = `
     <div class="bg-shape shape-1"></div>
