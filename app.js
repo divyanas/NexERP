@@ -5,16 +5,13 @@ let stream = null; // for media stream
 const appDiv = document.getElementById('app');
 
 const users = {
-  student: [{ id: 'S101', name: 'A.S.DIVYAN', role: 'student' },
-            { id: 'S102', name: 'S.HARISH', role: 'student' },
-            { id: 'S103', name: 'R.BHARATHWAJ', role: 'student' }],
-  faculty: [{ id: 'F201', name: 'Mrs. T.ANITHA', role: 'faculty' },
-            { id: 'F202', name: 'Dr. P.RANJANA', role: 'faculty' }
+  student: { id: 'S123', name: 'John Doe', role: 'student' },
+  faculty: { id: 'F456', name: 'Dr. Smith', role: 'faculty' }
 };
 
 const classes = [
   { id: 'CS101', name: 'Intro to Computer Science', time: '10:00 AM', attendance: 'pending' },
-  { id: 'CS202', name: 'Data Structures', time: '1:00 PM', attendance: 'pending' }
+  { id: 'CS202', name: 'Data Structures', time: '1:00 PM', attendance: 'present' }
 ];
 
 function render() {
@@ -64,56 +61,82 @@ window.setRole = (role) => {
 window.login = () => {
   const id = document.getElementById('userid').value.trim();
   if (!id) return;
-
-  if (currentRole === 'student') {
-    const student = users.students.find(s => s.id === id);
-    if (student) {
-      renderStudentDashboard(student);
-      return;
-    }
-  } else if (currentRole === 'faculty') {
-    const faculty = users.faculties.find(f => f.id === id);
-    if (faculty) {
-      renderFacultyDashboard(faculty);
-      return;
-    }
+  if (currentRole === 'student' && users.student.id === id) {
+    renderStudentDashboard();
+  } else if (currentRole === 'faculty' && users.faculty.id === id) {
+    renderFacultyDashboard();
+  } else {
+    document.getElementById('login-error').style.display = 'block';
   }
+}
 
-  document.getElementById('login-error').style.display = 'block';
-};
-
-
-function renderStudentDashboard(student) {
+function renderStudentDashboard() {
   appDiv.innerHTML = `
+    <div class="bg-shape shape-1"></div>
+    <div class="bg-shape shape-2"></div>
     <div class="dashboard">
       <div class="header">
         <div class="header-info">
-          <div>Welcome, ${student.name}</div>
-          <div>Student ID: ${student.id}</div>
+          <div>Welcome, ${users.student.name}</div>
+          <div>Student ID: ${users.student.id}</div>
         </div>
-        <button class="btn btn-outline" onclick="logout()">Logout</button>
+        <button class="btn btn-outline" style="width: auto;" onclick="logout()">Logout</button>
       </div>
-      <!-- rest of student dashboard -->
+      
+      <div class="grid">
+        <div class="glass-panel card">
+          <div class="card-header">Your Classes Today</div>
+          ${classes.map(c => `
+            <div class="list-item">
+              <div>
+                <strong style="color: #fff; font-size: 1.1rem;">${c.id}</strong> - ${c.name}<br>
+                <span style="font-size: 0.9rem; color: var(--text-muted);">${c.time}</span>
+              </div>
+              <span class="badge ${c.attendance}">${c.attendance}</span>
+            </div>
+          `).join('')}
+        </div>
+        
+        <div class="glass-panel card">
+          <div class="card-header">Smart Attendance</div>
+          <p>Scan your professor's QR code to mark your attendance using Face ID.</p>
+          <button class="btn" onclick="renderQRScan()">Scan QR Code</button>
+        </div>
+      </div>
     </div>
   `;
 }
 
-function renderFacultyDashboard(faculty) {
+function renderFacultyDashboard() {
   appDiv.innerHTML = `
+    <div class="bg-shape shape-1"></div>
+    <div class="bg-shape shape-2"></div>
     <div class="dashboard">
       <div class="header">
         <div class="header-info">
-          <div>Welcome, ${faculty.name}</div>
+          <div>Welcome, ${users.faculty.name}</div>
           <div>Department of Computer Science</div>
         </div>
-        <button class="btn btn-outline" onclick="logout()">Logout</button>
+        <button class="btn btn-outline" style="width: auto;" onclick="logout()">Logout</button>
       </div>
-      <!-- rest of faculty dashboard -->
+      
+      <div class="grid">
+        <div class="glass-panel card">
+          <div class="card-header">Manage Classes</div>
+          ${classes.map(c => `
+            <div class="list-item">
+              <div>
+                <strong style="color: #fff; font-size: 1.1rem;">${c.id}</strong> - ${c.name}<br>
+                <span style="font-size: 0.9rem; color: var(--text-muted);">${c.time}</span>
+              </div>
+              <button class="btn" style="width: auto; padding: 8px 16px; font-size: 0.9rem; margin-bottom: 0;" onclick="renderQRCreation('${c.id}')">Start Session</button>
+            </div>
+          `).join('')}
+        </div>
+      </div>
     </div>
   `;
 }
-
-
 
 window.renderQRCreation = (classId) => {
   appDiv.innerHTML = `
