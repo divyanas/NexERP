@@ -72,7 +72,7 @@ window.login = () => {
       return;
     }
   } else if (currentRole === 'faculty') {
-    const faculty = users.faculty.find(f => f.id === id);
+    const faculty = users.faculties.find(f => f.id === id);
     if (faculty) {
       renderFacultyDashboard(faculty);
       return;
@@ -83,42 +83,9 @@ window.login = () => {
 };
 
 
-function renderStudentDashboard() {
-  appDiv.innerHTML = `
-    <div class="bg-shape shape-1"></div>
-    <div class="bg-shape shape-2"></div>
-    <div class="dashboard">
-      <div class="header">
-        <div class="header-info">
-          <div>Welcome, ${users.student.name}</div>
-          <div>Student ID: ${users.student.id}</div>
-        </div>
-        <button class="btn btn-outline" style="width: auto;" onclick="logout()">Logout</button>
-      </div>
-      
-      <div class="grid">
-        <div class="glass-panel card">
-          <div class="card-header">Your Classes Today</div>
-          ${classes.map(c => `
-            <div class="list-item">
-              <div>
-                <strong style="color: #fff; font-size: 1.1rem;">${c.id}</strong> - ${c.name}<br>
-                <span style="font-size: 0.9rem; color: var(--text-muted);">${c.time}</span>
-              </div>
-              <span class="badge ${c.attendance}">${c.attendance}</span>
-            </div>
-          `).join('')}
-        </div>
-        
-        <div class="glass-panel card">
-          <div class="card-header">Smart Attendance</div>
-          <p>Scan your professor's QR code to mark your attendance using Face ID.</p>
-          <button class="btn" onclick="renderQRScan()">Scan QR Code</button>
-        </div>
-      </div>
-    </div>
-  `;
-}
+  document.getElementById('login-error').style.display = 'block';
+};
+
 
 function renderStudentDashboard(student) {
   appDiv.innerHTML = `
@@ -149,6 +116,7 @@ function renderFacultyDashboard(faculty) {
     </div>
   `;
 }
+
 
 
 
