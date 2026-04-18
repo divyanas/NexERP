@@ -5,13 +5,16 @@ let stream = null; // for media stream
 const appDiv = document.getElementById('app');
 
 const users = {
-  student: { id: 'S123', name: 'John Doe', role: 'student' },
-  faculty: { id: 'F456', name: 'Dr. Smith', role: 'faculty' }
+  student: { id: 'S123', name: 'A.S.DIVYAN', role: 'student' },
+  student: { id: 'S456', name: 'S.HARISH', role: 'student'},
+  student: { id: 'S456', name: 'S.HARISH', role: 'student'},
+  faculty: { id: 'F456', name: 'Mrs. T.ANITHA', role: 'faculty' },
+  faculty: { id: 'F789', name: 'Dr. P.Ranjana', role: 'faculty' }
 };
 
 const classes = [
   { id: 'CS101', name: 'Intro to Computer Science', time: '10:00 AM', attendance: 'pending' },
-  { id: 'CS202', name: 'Data Structures', time: '1:00 PM', attendance: 'present' }
+  { id: 'CS202', name: 'Data Structures', time: '1:00 PM', attendance: 'pending' }
 ];
 
 function render() {
