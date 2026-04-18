@@ -7,7 +7,7 @@ const appDiv = document.getElementById('app');
 const users = {
   student: { id: 'S123', name: 'A.S.DIVYAN', role: 'student' },
   student: { id: 'S456', name: 'S.HARISH', role: 'student'},
-  student: { id: 'S456', name: 'S.HARISH', role: 'student'},
+  student: { id: 'S789', name: 'R.BHARATHWAJ', role: 'student'},
   faculty: { id: 'F456', name: 'Mrs. T.ANITHA', role: 'faculty' },
   faculty: { id: 'F789', name: 'Dr. P.Ranjana', role: 'faculty' }
 };
