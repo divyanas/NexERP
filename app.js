@@ -1,4 +1,5 @@
 let currentRole = 'student';
+let loggedInUser = null;
 let html5QrcodeScanner = null;
 let stream = null; // for media stream
 
@@ -71,18 +72,21 @@ window.login = () => {
   if (!id) return;
 
   if (currentRole === 'student') {
-    const student = users.students.find(s => s.id === id);
-    if (student) {
-      renderStudentDashboard(student);
-      return;
-    }
-  } else if (currentRole === 'faculty') {
-    const faculty = users.faculty.find(f => f.id === id);
-    if (faculty) {
-      renderFacultyDashboard(faculty);
-      return;
-    }
+  const student = users.students.find(s => s.id === id);
+  if (student) {
+    loggedInUser = student;
+    renderStudentDashboard(student);
+    return;
   }
+} else if (currentRole === 'faculty') {
+  const faculty = users.faculty.find(f => f.id === id);
+  if (faculty) {
+    loggedInUser = faculty;
+    renderFacultyDashboard(faculty);
+    return;
+  }
+}
+onclick="shutdownQR(); renderStudentDashboard(loggedInUser)"
 
   document.getElementById('login-error').style.display = 'block';
 };
@@ -116,6 +120,7 @@ function renderFacultyDashboard(faculty) {
     </div>
   `;
 }
+onclick="renderFacultyDashboard(loggedInUser)"
 
 
 
@@ -251,7 +256,7 @@ window.renderFaceVerification = (qrData) => {
           // Update attendance state
           classes[0].attendance = 'present';
           
-          setTimeout(() => renderStudentDashboard(), 2500);
+          setTimeout(() => renderStudentDashboard(loggedInUser), 2500);
           
         }, 3000);
       }, 1500);
