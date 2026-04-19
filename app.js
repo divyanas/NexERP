@@ -1,7 +1,7 @@
 let currentRole = 'student';
 let html5QrcodeScanner = null;
-let stream = null; // for media stream
-let loggedInUser = null; // store the currently logged-in user
+let stream = null;
+let loggedInUser = null; // store logged-in user
 
 const appDiv = document.getElementById('app');
 
@@ -58,12 +58,7 @@ function renderAuth() {
 
 window.setRole = (role) => {
   currentRole = role;
-  appDiv.innerHTML = '';
-  appDiv.innerHTML += `
-    <div class="bg-shape shape-1"></div>
-    <div class="bg-shape shape-2"></div>
-  `;
-  renderAuth();
+  render();
 }
 
 window.login = () => {
@@ -193,22 +188,4 @@ window.renderQRScan = () => {
         <p>Position the QR code within the frame.</p>
         
         <div id="reader"></div>
-        <div class="status-message info" id="scan-info" style="display: block;">Requesting camera access...</div>
-      </div>
-    </div>
-  `;
-  
-  html5QrcodeScanner = new Html5Qrcode("reader");
-  
-  const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-  
-  html5QrcodeScanner.start(
-    { facingMode: "environment" },
-    config,
-    (decodedText) => {
-      document.getElementById('scan-info').className = 'status-message success';
-      document.getElementById('scan-info').innerText = 'QR Code Scanned Successfully!';
-      shutdownQR();
-      setTimeout(() => renderFaceVerification(decodedText), 1000);
-    },
-    (errorMessage) => {}
+        <div class="
