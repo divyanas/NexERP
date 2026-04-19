@@ -1,7 +1,7 @@
 let currentRole = 'student';
-let loggedInUser = null;
 let html5QrcodeScanner = null;
 let stream = null; // for media stream
+let loggedInUser = null; // store the currently logged-in user
 
 const appDiv = document.getElementById('app');
 
@@ -16,7 +16,6 @@ const users = {
     { id: 'F202', name: 'Dr. P. RANJANA', role: 'faculty' }
   ]
 };
-
 
 const classes = [
   { id: 'CS101', name: 'Intro to Computer Science', time: '10:00 AM', attendance: 'pending' },
@@ -46,7 +45,7 @@ function renderAuth() {
         <div class="role-btn ${currentRole === 'faculty' ? 'active' : ''}" onclick="setRole('faculty')">Faculty</div>
       </div>
       
-      <input type="text" id="userid" placeholder="${currentRole === 'student' ? 'Student ID' : 'Faculty ID'} (e.g. S123 or F456)" />
+      <input type="text" id="userid" placeholder="${currentRole === 'student' ? 'Student ID (e.g. S101)' : 'Faculty ID (e.g. F201)'}" />
       <input type="password" id="password" placeholder="Password (any)" />
       
       <button class="btn" onclick="login()">Login to Dashboard</button>
@@ -72,21 +71,20 @@ window.login = () => {
   if (!id) return;
 
   if (currentRole === 'student') {
-  const student = users.students.find(s => s.id === id);
-  if (student) {
-    loggedInUser = student;
-    renderStudentDashboard(student);
-    return;
+    const student = users.students.find(s => s.id === id);
+    if (student) {
+      loggedInUser = student;
+      renderStudentDashboard(student);
+      return;
+    }
+  } else if (currentRole === 'faculty') {
+    const faculty = users.faculty.find(f => f.id === id);
+    if (faculty) {
+      loggedInUser = faculty;
+      renderFacultyDashboard(faculty);
+      return;
+    }
   }
-} else if (currentRole === 'faculty') {
-  const faculty = users.faculty.find(f => f.id === id);
-  if (faculty) {
-    loggedInUser = faculty;
-    renderFacultyDashboard(faculty);
-    return;
-  }
-}
-onclick="shutdownQR(); renderStudentDashboard(loggedInUser)"
 
   document.getElementById('login-error').style.display = 'block';
 };
@@ -101,7 +99,27 @@ function renderStudentDashboard(student) {
         </div>
         <button class="btn btn-outline" onclick="logout()">Logout</button>
       </div>
-      <!-- rest of student dashboard -->
+      
+      <div class="grid">
+        <div class="glass-panel card">
+          <div class="card-header">Your Classes Today</div>
+          ${classes.map(c => `
+            <div class="list-item">
+              <div>
+                <strong style="color: #fff; font-size: 1.1rem;">${c.id}</strong> - ${c.name}<br>
+                <span style="font-size: 0.9rem; color: var(--text-muted);">${c.time}</span>
+              </div>
+              <span class="badge ${c.attendance}">${c.attendance}</span>
+            </div>
+          `).join('')}
+        </div>
+        
+        <div class="glass-panel card">
+          <div class="card-header">Smart Attendance</div>
+          <p>Scan your professor's QR code to mark your attendance using Face ID.</p>
+          <button class="btn" onclick="renderQRScan()">Scan QR Code</button>
+        </div>
+      </div>
     </div>
   `;
 }
@@ -116,20 +134,29 @@ function renderFacultyDashboard(faculty) {
         </div>
         <button class="btn btn-outline" onclick="logout()">Logout</button>
       </div>
-      <!-- rest of faculty dashboard -->
+      
+      <div class="grid">
+        <div class="glass-panel card">
+          <div class="card-header">Manage Classes</div>
+          ${classes.map(c => `
+            <div class="list-item">
+              <div>
+                <strong style="color: #fff; font-size: 1.1rem;">${c.id}</strong> - ${c.name}<br>
+                <span style="font-size: 0.9rem; color: var(--text-muted);">${c.time}</span>
+              </div>
+              <button class="btn" style="width: auto; padding: 8px 16px; font-size: 0.9rem; margin-bottom: 0;" onclick="renderQRCreation('${c.id}')">Start Session</button>
+            </div>
+          `).join('')}
+        </div>
+      </div>
     </div>
   `;
 }
-onclick="renderFacultyDashboard(loggedInUser)"
-
-
 
 window.renderQRCreation = (classId) => {
   appDiv.innerHTML = `
-    <div class="bg-shape shape-1"></div>
-    <div class="bg-shape shape-2"></div>
     <div class="dashboard">
-      <button class="btn btn-outline" style="width: auto; margin-bottom: 2rem;" onclick="renderFacultyDashboard()">← Back to Dashboard</button>
+      <button class="btn btn-outline" style="width: auto; margin-bottom: 2rem;" onclick="renderFacultyDashboard(loggedInUser)">← Back to Dashboard</button>
       
       <div class="glass-panel" style="text-align: center; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #fff; margin-bottom: 1rem;">Active Session: ${classId}</h2>
@@ -158,10 +185,8 @@ window.renderQRCreation = (classId) => {
 
 window.renderQRScan = () => {
   appDiv.innerHTML = `
-    <div class="bg-shape shape-1"></div>
-    <div class="bg-shape shape-2"></div>
     <div class="dashboard">
-      <button class="btn btn-outline" style="width: auto; margin-bottom: 2rem;" onclick="shutdownQR(); renderStudentDashboard()">← Cancel</button>
+      <button class="btn btn-outline" style="width: auto; margin-bottom: 2rem;" onclick="shutdownQR(); renderStudentDashboard(loggedInUser)">← Cancel</button>
       
       <div class="glass-panel" style="text-align: center; max-width: 500px; margin: 0 auto;">
         <h2 style="color: #fff; margin-bottom: 1rem;">Scan Attendance QR</h2>
@@ -181,102 +206,9 @@ window.renderQRScan = () => {
     { facingMode: "environment" },
     config,
     (decodedText) => {
-      // Success
       document.getElementById('scan-info').className = 'status-message success';
       document.getElementById('scan-info').innerText = 'QR Code Scanned Successfully!';
       shutdownQR();
       setTimeout(() => renderFaceVerification(decodedText), 1000);
     },
-    (errorMessage) => {
-      // parse error, ignore
-    }
-  ).catch((err) => {
-    document.getElementById('scan-info').className = 'status-message absent';
-    document.getElementById('scan-info').innerText = 'Camera Error: Please allow camera permissions.';
-  });
-}
-
-window.shutdownQR = () => {
-  if (html5QrcodeScanner) {
-    try {
-      html5QrcodeScanner.stop().catch(e => console.log(e));
-    } catch(e){}
-    html5QrcodeScanner = null;
-  }
-}
-
-window.renderFaceVerification = (qrData) => {
-  appDiv.innerHTML = `
-    <div class="bg-shape shape-1"></div>
-    <div class="bg-shape shape-2"></div>
-    <div class="dashboard">
-      <div class="glass-panel" style="text-align: center; max-width: 500px; margin: 0 auto;">
-        <h2 style="color: #fff; margin-bottom: 1rem;">Face Verification</h2>
-        <p>Please look directly at the camera to verify your identity.</p>
-        
-        <div class="video-container" id="video-container">
-          <video id="webcam" autoplay playsinline></video>
-          <div class="face-frame"></div>
-          <div class="scan-overlay" id="scan-overlay">
-            <div class="scan-line"></div>
-          </div>
-        </div>
-        
-        <div class="status-message info" id="face-status" style="display: block;">Activating front camera...</div>
-      </div>
-    </div>
-  `;
-  
-  const video = document.getElementById('webcam');
-  const overlay = document.getElementById('scan-overlay');
-  const status = document.getElementById('face-status');
-  
-  navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
-    .then(mediaStream => {
-      stream = mediaStream;
-      video.srcObject = mediaStream;
-      document.getElementById('video-container').style.display = 'block';
-      status.innerText = "Analyzing facial features...";
-      
-      // Simulate face analysis
-      setTimeout(() => {
-        overlay.style.display = 'block'; 
-        status.innerText = "Scanning biometrics...";
-        
-        setTimeout(() => {
-          overlay.style.display = 'none';
-          status.innerText = "Face Verified Successfully!";
-          status.className = "status-message success";
-          
-          if (stream) {
-            stream.getTracks().forEach(track => track.stop());
-            stream = null;
-          }
-          
-          // Update attendance state
-          classes[0].attendance = 'present';
-          
-          setTimeout(() => renderStudentDashboard(loggedInUser), 2500);
-          
-        }, 3000);
-      }, 1500);
-      
-    })
-    .catch(err => {
-      status.innerText = "Camera access denied. Cannot verify face.";
-      status.className = "status-message absent";
-    });
-}
-
-window.logout = () => {
-  if (stream) {
-    stream.getTracks().forEach(track => track.stop());
-    stream = null;
-  }
-  shutdownQR();
-  currentRole = 'student';
-  renderAuth();
-}
-
-// Start Application Flow
-render();
+    (errorMessage) => {}
