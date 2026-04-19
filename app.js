@@ -5,7 +5,7 @@ let stream = null; // for media stream
 const appDiv = document.getElementById('app');
 
 const users = {
-  student: { id: 'S123', name: 'Divyan', role: 'student' },
+  student: { id: 'S123', name: 'John Doe', role: 'student' },
   faculty: { id: 'F456', name: 'Dr. Smith', role: 'faculty' }
 };
 
