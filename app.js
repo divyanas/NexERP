@@ -23,8 +23,7 @@ const classes = [
 ];
 
 function render() {
-  appDiv.innerHTML = '';
-  appDiv.innerHTML += `
+  appDiv.innerHTML = `
     <div class="bg-shape shape-1"></div>
     <div class="bg-shape shape-2"></div>
   `;
@@ -139,7 +138,7 @@ function renderFacultyDashboard(faculty) {
                 <strong style="color: #fff; font-size: 1.1rem;">${c.id}</strong> - ${c.name}<br>
                 <span style="font-size: 0.9rem; color: var(--text-muted);">${c.time}</span>
               </div>
-              <button class="btn" style="width: auto; padding: 8px 16px; font-size: 0.9rem; margin-bottom: 0;" onclick="renderQRCreation('${c.id}')">Start Session</button>
+              <button class="btn" onclick="renderQRCreation('${c.id}')">Start Session</button>
             </div>
           `).join('')}
         </div>
@@ -151,17 +150,10 @@ function renderFacultyDashboard(faculty) {
 window.renderQRCreation = (classId) => {
   appDiv.innerHTML = `
     <div class="dashboard">
-      <button class="btn btn-outline" style="width: auto; margin-bottom: 2rem;" onclick="renderFacultyDashboard(loggedInUser)">← Back to Dashboard</button>
-      
+      <button class="btn btn-outline" onclick="renderFacultyDashboard(loggedInUser)">← Back to Dashboard</button>
       <div class="glass-panel" style="text-align: center; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #fff; margin-bottom: 1rem;">Active Session: ${classId}</h2>
-        <p>Display this QR code for students to scan.</p>
-        
-        <div class="qr-container">
-          <div id="qrcode"></div>
-        </div>
-        
-        <p style="color: var(--accent); font-weight: 500;">Dynamic QR scanning is enabled.<br>Students will verify with Face Recognition.</p>
+        <div class="qr-container"><div id="qrcode"></div></div>
       </div>
     </div>
   `;
@@ -181,11 +173,14 @@ window.renderQRCreation = (classId) => {
 window.renderQRScan = () => {
   appDiv.innerHTML = `
     <div class="dashboard">
-      <button class="btn btn-outline" style="width: auto; margin-bottom: 2rem;" onclick="shutdownQR(); renderStudentDashboard(loggedInUser)">← Cancel</button>
-      
+      <button class="btn btn-outline" onclick="shutdownQR(); renderStudentDashboard(loggedInUser)">← Cancel</button>
       <div class="glass-panel" style="text-align: center; max-width: 500px; margin: 0 auto;">
         <h2 style="color: #fff; margin-bottom: 1rem;">Scan Attendance QR</h2>
-        <p>Position the QR code within the frame.</p>
-        
         <div id="reader"></div>
-        <div class="
+        <div class="status-message info" id="scan-info">Requesting camera access...</div>
+      </div>
+    </div>
+  `;
+  
+  html5QrcodeScanner = new Html5Qrcode("reader");
+  const config = { fps: 10
